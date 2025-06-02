@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Root Cause Analyzer</title>
+  <style>
+    * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f8f9fa;
+  background-image: url('../static/bg1.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+  margin: 20px auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-height: 300px;
+}
+
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+h3 {
+  color: #3498db;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+h4 {
+  color: #2c3e50;
+  margin: 15px 0 10px;
+  font-size: 1.2rem;
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  margin: 12px 0;
+  padding: 12px 15px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+textarea:focus, input[type="text"]:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  background-color: #fff;
+}
+
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+button {
+  width: 100%;
+  margin: 15px 0;
+  padding: 12px;
+  font-size: 1.1em;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.nav-buttons button {
+  background-color: #3498db;
+  color: white;
+  margin: 5px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.nav-buttons button:hover {
+  background-color: #2980b9;
+}
+
+#insight-section button, #rca-section button {
+  background-color: #2ecc71;
+}
+
+#insight-section button:hover, #rca-section button:hover {
+  background-color: #27ae60;
+}
+
+#feedback-section button {
+  background-color: #e74c3c;
+}
+
+#feedback-section button:hover {
+  background-color: #c0392b;
+}
+
+.card {
+  margin-top: 25px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #3498db;
+  overflow-x: auto;
+}
+
+.card pre {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 15px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.section {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+#result strong, #feedback-reward strong {
+  color: #2c3e50;
+}
+
+#feedback-reward {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: #e8f4fc;
+  color: #2980b9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+  }
+  
+  .nav-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .nav-buttons button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  
+  .container {
+    padding: 15px;
+  }
+  
+  textarea, input[type="text"] {
+    padding: 10px;
+  }
+}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Root Cause Analyzer</h2>
+
+  <div class="nav-buttons">
+    <button onclick="showSection('insight-section')">Log Parsing & Insight Generation</button>
+    <button onclick="showSection('rca-section')">RCA Prediction</button>
+  </div>
+
+  <!-- Insight Section -->
+  <div id="insight-section" class="section">
+    <h3>Log Parsing & Insight Generation</h3>
+    <label for="insight-log">Enter Raw Log:</label>
+    <textarea id="insight-log" rows="5" placeholder="Paste full raw log here..."></textarea>
+    <button onclick="generateInsight()">Generate Insight</button>
+
+    <div class="card" id="insight-output" style="display:none;">
+      <h4>Parsed Log</h4>
+      <pre id="parsed-log"></pre>
+      <h4>Insight</h4>
+      <pre id="insight-text"></pre>
+    </div>
+  </div>
+
+  <!-- RCA Section -->
+  <div id="rca-section" class="section">
+    <h3>RCA Prediction</h3>
+    <label for="log">Enter Component / Log Message:</label>
+    <textarea id="log" rows="5" placeholder="Enter log or component here..."></textarea>
+    <button onclick="predictRCA()">Predict Root Cause</button>
+
+    <div class="card" id="result" style="display:none;">
+      <p><strong>Prediction:</strong> <span id="prediction"></span></p>
+      <p><strong>Confidence:</strong> <span id="confidence"></span>%</p>
+    </div>
+
+    <div class="card" id="feedback-section" style="display:none;">
+      <h4>Feedback (Reinforcement Learning)</h4>
+      <label for="actual">Correct Root Cause:</label>
+      <input type="text" id="actual" placeholder="Enter actual root cause">
+      <button onclick="sendFeedback()">Submit Feedback</button>
+      <p id="feedback-reward"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll(".section").forEach(sec => sec.style.display = "none");
+    document.getElementById(id).style.display = "block";
+  }
+
+  function predictRCA() {
+    const log = document.getElementById('log').value;
+    fetch('/rca', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `log=${encodeURIComponent(log)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        document.getElementById('prediction').textContent = data.prediction;
+        document.getElementById('confidence').textContent = data.confidence;
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('feedback-section').style.display = 'block';
+      }
+    });
+  }
+
+  function sendFeedback() {
+    const log = document.getElementById('log').value;
+    const actual = document.getElementById('actual').value;
+    fetch('/rl', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `log=${encodeURIComponent(log)}&actual=${encodeURIComponent(actual)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+  if (data.error) {
+    alert(data.error);
+  } else {
+    const reward = data.reward;
+    let msg = "";
+    if (reward === 1) {
+      msg = "Correct prediction confirmed ✅ Thanks for your input!";
+    } else {
+      msg = "Prediction differed; retraining underway 🔁 The system is learning from your feedback to improve future predictions.";
+    }
+    document.getElementById('feedback-reward').textContent = `Reward: ${reward} - ${msg}`;
+
+  }
+});
+
+  }
+
+  function generateInsight() {
+    const log = document.getElementById('insight-log').value;
+    fetch('/parse_insight', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `log=${encodeURIComponent(log)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        document.getElementById('parsed-log').textContent = JSON.stringify(data.parsed_log, null, 2);
+        document.getElementById('insight-text').textContent = data.insights;
+        document.getElementById('insight-output').style.display = 'block';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
