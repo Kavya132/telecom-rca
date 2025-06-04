@@ -5,8 +5,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 import google.generativeai as genai
 import re
+from flask_cors import CORS 
 
-app = Flask(__name__)
+app = Flask(_name_)
+CORS(app)
 
 # Configure Gemini API key
 genai.configure(api_key="AIzaSyDGrUHQSSeVt2YtD81SfAd9OjJkzOdg4-I")
